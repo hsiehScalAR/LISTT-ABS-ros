@@ -6,17 +6,21 @@ import serial
 from numpy import random
 import serial.tools.list_ports
 
-ports = serial.tools.list_ports.grep('/dev/ttyUSB')
+device = rospy.get_param("/device")
+baudrate_p = rospy.get_param("/baudrate")
+
+
 
 #Automated Scanning of Serial Port for Communication
 ##################################################################################
-for port, desc, hwid in sorted(ports):
-        print("Communication available at {}: {} [{}]".format(port, desc, hwid))
-print(f'Communicating with port:{port}')
+#ports = serial.tools.list_ports.grep('/dev/ttyUSB')
+#for port, desc, hwid in sorted(ports):
+#        print("Communication available at {}: {} [{}]".format(port, desc, hwid))
+#print(f'Communicating with port:{port}')
 ##################################################################################
 
 #Uncomment the below line and set the port to the known port and comment the above three lines
-# port = "/dev/ttyUSB0"
+port = device
 
 #Establish Serial Communication at the Port with:
 # BaudRate    = 9600
@@ -24,7 +28,7 @@ print(f'Communicating with port:{port}')
 # Parity      = None
 # Stopbits    = 1
 # FlowControl = None #not catered to in the below line
-ser = serial.Serial(port, baudrate=9600,bytesize = serial.EIGHTBITS,parity = serial.PARITY_NONE,stopbits = serial.STOPBITS_ONE )
+ser = serial.Serial(port, baudrate=baudrate_p,bytesize = serial.EIGHTBITS,parity = serial.PARITY_NONE,stopbits = serial.STOPBITS_ONE )
  
 def serial_comm():
     #Publishes on Topic: TurbidityData, msg: Turbidity
@@ -39,7 +43,7 @@ def serial_comm():
     #  turbidity_mmt: float64
      pub = rospy.Publisher('TurbidityData', Turbidity, queue_size=20)
      rospy.init_node('serial_comm', anonymous=True)
-     rate = rospy.Rate(9600) # 10hz
+     rate = rospy.Rate(baudrate_p) # 10hz
      msg = Turbidity()
      msg.header = Header()
      while not rospy.is_shutdown():
@@ -48,12 +52,18 @@ def serial_comm():
          msg.header.frame_id = "Turbidity Levels"
          msg.header.stamp = rospy.Time.now()
          data = ser.readline().strip().decode()
-         if data == '\x00':
-             msg.turbidity_mmt = None
-         else:
-            msg.turbidity_mmt = float(data)
-         rospy.loginfo(msg)
-         pub.publish(msg)
+         data = data.rstrip('\x00')
+         if msg.header.seq == 1:
+             continue
+         else :
+            if data == '\x00':
+                msg.turbidity_mmt = None
+            elif data == '':
+                msg.turbidity_mmt = None
+            else:
+                msg.turbidity_mmt = float(data)
+            rospy.loginfo(msg)
+            pub.publish(msg)
          rate.sleep()
  
 if __name__ == '__main__':

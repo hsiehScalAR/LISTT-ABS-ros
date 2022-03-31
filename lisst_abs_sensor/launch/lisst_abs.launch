@@ -1,5 +1,5 @@
 <launch>
-    <node pkg="lisst_abs_sensor" name="lisst_abs_listner" type="lisst_abs_listner.py" />
+    <node pkg="lisst_abs_sensor" name="lisst_abs_sensor_publisher" type="lisst_abs_sensor_publisher.py" />
     <rosparam file="$(find lisst_abs_sensor)/config/sensor_config.yaml" />
 </launch>
 
