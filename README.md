@@ -35,10 +35,10 @@ The configuration is stored in `config/sensor_config.yaml`
 device: /dev/ttyUSB0
 baudrate: 9600
 ```
-You might need to change the port the sensor is connected to. However, the default settings should work most of the times. You can find the port the sensor is connected to via `dmesg|tail`
+You might need to change the port the sensor is connected to. However, the default settings should work most of the times. You can find the port to which the sensor is connected to via `dmesg|tail`
 
 #### Message Format
-`msg\Turbidity.msg` file contains information about the message type published on the rostopic: `TurbidityData`. Currently the message format is :
+`msg/Turbidity.msg` file contains information about the message type published on the rostopic: `TurbidityData`. Currently the message format is :
 ```
 Header header
 float64 turbidity_mmt
@@ -69,7 +69,7 @@ The Launch File contains the package name: `lisst_abs_sensor`, the script name: 
 In order to run the driver ensure that the sensor is plugged into the computer and the green LED is blinking. Then run the driver by uisng the roslaunch command and the launch file.
 ```
 $ cd catkin_ws
-$ source devel/setup.bash
+$ source devel\setup.bash
 $ roslaunch lisst_abs_sensor lisst_abs.launch
 ```
 
